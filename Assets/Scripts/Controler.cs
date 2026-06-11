@@ -9,7 +9,6 @@ public class Controler : MonoBehaviour
     [SerializeField] private Animator _animator;
     
     private float _horizontalInput;
-    private bool _isJumping;
     private Rigidbody2D _rigidbody2d;
     private Collider2D _collider;
 
@@ -35,24 +34,10 @@ public class Controler : MonoBehaviour
         _animator.SetBool("IsRunning", shouldRun);
         _animator.SetBool("IsJumping", !isGrounded);
         
-        if (shouldRun && !_isJumping)
-            _animator.Play("Run");
-        
-        else if (isGrounded && !shouldRun && !_isJumping)
-            _animator.Play("Idle");
-        
         if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
         {
             _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
-            _isJumping = true;
-            _animator.SetBool("IsJumping", true);
-            _animator.Play("Jump");
-        }
-        
-        if (isGrounded)
-        {
-            _isJumping = false;
-            _animator.SetBool("IsJumping", false);
+
         }
     }
     
@@ -64,7 +49,8 @@ public class Controler : MonoBehaviour
     private bool IsGrounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(_rigidbody2d.transform.position, Vector2.down, _collider.bounds.extents.y);
-        
+
+        Debug.DrawRay(_rigidbody2d.transform.position,Vector2.down * _collider.bounds.extents.y);
         return hit.collider != null;
     }
 }
