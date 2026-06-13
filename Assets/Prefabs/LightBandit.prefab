@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 61252362154681264}
   - component: {fileID: -2775565510217759494}
   - component: {fileID: 8481061309690600598}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LightBandit
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -207,3 +207,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3
+  _maxDistance: 0.01
