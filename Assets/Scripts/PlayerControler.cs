@@ -49,7 +49,8 @@ public class PlayerControler : MonoBehaviour
 
     private void Jump()
     {
-        _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
+        if(IsGrounded())
+            _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
     }
     
     private bool IsGrounded()
