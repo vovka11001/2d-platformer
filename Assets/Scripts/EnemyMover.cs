@@ -7,6 +7,7 @@ public class EnemyMover : MonoBehaviour
     [SerializeField] private float _maxDistance = 0.01f;
     [SerializeField] private Target[] _targets;
     [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     private Vector2 _targetPosition;
     private Vector2 _previousPosition;
@@ -14,24 +15,18 @@ public class EnemyMover : MonoBehaviour
 
     public event UnityAction Runned;
 
+    private void Awake()
+    {
+        _rigidbody2d = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+    
     private void Start()
     {
         transform.position = _spawnPoint.position;
         _previousPosition = _rigidbody2d.position;
-
-        int enemyLayer = LayerMask.NameToLayer("Enemy");
-        int playerLayer = LayerMask.NameToLayer("Player");
-
-        Physics2D.IgnoreLayerCollision(enemyLayer, enemyLayer, true);
-        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
-
-        int randomTargetIndex = Random.Range(0, _targets.Length);
-        Vector2 targetPosition = _targets[randomTargetIndex].transform.position;
+        
         SetTarget();
-    }
-    private void Awake()
-    {
-        _rigidbody2d = GetComponent<Rigidbody2D>();
     }
     
     private void FixedUpdate()
@@ -53,12 +48,12 @@ public class EnemyMover : MonoBehaviour
         {
             Runned?.Invoke();
             if (direction.x > 0)
-                transform.localScale = new Vector2(-1, 1);
+                _spriteRenderer.flipX = true;
             else if (direction.x < 0)
-                transform.localScale = new Vector2(1, 1);
+                _spriteRenderer.flipX = false;
         }
 
-            _previousPosition = _rigidbody2d.position;
+        _previousPosition = _rigidbody2d.position;
     }
 
     public void SetTarget()

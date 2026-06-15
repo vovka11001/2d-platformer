@@ -7,39 +7,49 @@ public class PlayerControler : MonoBehaviour
     [SerializeField] private float _speed = 5f;
     [SerializeField] private float _jumpForce = 10f;
     [SerializeField] private Animator _animator;
+    [SerializeField] private InputReader _inputReader;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
     
-    private float _horizontalInput;
     private Rigidbody2D _rigidbody2d;
+
+    private void OnEnable()
+    {
+        _inputReader.Jumped += Jump;
+    }
+
+    private void OnDisable()
+    {
+        _inputReader.Jumped -= Jump;
+    }
 
     private void Awake()
     {
         _rigidbody2d = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
     
     private void Update()
     {
-        _horizontalInput = Input.GetAxisRaw("Horizontal");
-        
-        if (_horizontalInput > 0)
-            transform.localScale = new Vector2(-1, 1);
-        
-        else if (_horizontalInput < 0)
-            transform.localScale = new Vector2(1, 1);
+        if (_inputReader.HorizontalInput > 0)
+            _spriteRenderer.flipX = true;
+        else if (_inputReader.HorizontalInput < 0)
+            _spriteRenderer.flipX = false;
         
         bool isGrounded = IsGrounded();
-        bool shouldRun = Mathf.Abs(_horizontalInput) > 0 && isGrounded;
+        bool shouldRun = Mathf.Abs(_inputReader.HorizontalInput) > 0 && isGrounded;
         
-        _animator.SetBool("IsRunning", shouldRun);
-        _animator.SetBool("Grounded", isGrounded);
-        
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
-            _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
-
+        _animator.SetBool(AnimatorData.Params.IsRunning, shouldRun);
+        _animator.SetBool(AnimatorData.Params.Grounded, isGrounded);
     }
     
     private void FixedUpdate()
     {
-        _rigidbody2d.velocity = new Vector2(_horizontalInput * _speed, _rigidbody2d.velocity.y);
+        _rigidbody2d.velocity = new Vector2(_inputReader.HorizontalInput * _speed, _rigidbody2d.velocity.y);
+    }
+
+    private void Jump()
+    {
+        _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
     }
     
     private bool IsGrounded()

@@ -22,13 +22,13 @@ public class EnemyAnimationController : MonoBehaviour
 
     private void Update()
     {
-        _animator.SetBool("Grounded", IsGrounded());
+        _animator.SetBool(AnimatorData.Params.Grounded, IsGrounded());
     }
 
     private void SetAnimation()
     {
         if(IsGrounded())
-            _animator.SetBool("IsRunning", true);
+            _animator.SetBool(AnimatorData.Params.IsRunning, true);
     }
 
     private bool IsGrounded()
