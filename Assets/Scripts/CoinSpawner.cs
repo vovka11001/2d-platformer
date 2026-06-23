@@ -1,35 +1,20 @@
 using UnityEngine;
 
-public class CoinSpawner : MonoBehaviour
+public class CoinSpawner : Spawner<Coin>
 {
-    [SerializeField] private Transform[] _spawnPoints;
-    [SerializeField] private Coin _coinPrefab;
-    [SerializeField] private CoinDetector _coinDetector;
-
+    [SerializeField] private CoinDetector _detector;
+    
     private void OnEnable()
     {
-        _coinDetector.TriggerEntered += DeleteCoin;
+        _detector.TriggerEntered += DestroyCoin;
     }
 
     private void OnDisable()
     {
-        _coinDetector.TriggerEntered -= DeleteCoin;
+        _detector.TriggerEntered -= DestroyCoin;
     }
 
-    private void Start()
-    {
-        if (_spawnPoints == null || _spawnPoints.Length == 0)
-            return;
-
-        int coinsCount = _spawnPoints.Length;
-
-        for (int i = 0; i < coinsCount; i++)
-        {
-            Coin newCoin = Instantiate(_coinPrefab, _spawnPoints[i].position, Quaternion.identity);
-        }
-    }
-
-    private void DeleteCoin(Coin coin)
+    private void DestroyCoin(Coin coin)
     {
         Destroy(coin.gameObject);
     }

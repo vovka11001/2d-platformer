@@ -4,15 +4,24 @@ public class EnemyAnimationController : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private EnemyMover _mover;
+    [SerializeField] private Enemy _enemy;
 
     private void OnEnable()
     {
-        _mover.Runned += SetAnimation;
+        _enemy.Hurt += SetAnimationHurt;
+        _mover.Runned += SetAnimationRun;
+        _mover.StopedMoving += SetAnimationIdle;
+        _mover.Attacking += SetAnimationAttacking;
+        _enemy.Death += SetAnimationDie;
     }
 
     private void OnDisable()
     {
-        _mover.Runned -= SetAnimation;
+        _enemy.Hurt -= SetAnimationHurt;
+        _mover.Runned -= SetAnimationRun;
+        _mover.StopedMoving -= SetAnimationIdle;
+        _mover.Attacking -= SetAnimationAttacking;
+        _enemy.Death += SetAnimationDie;
     }
 
     private void Awake()
@@ -25,10 +34,29 @@ public class EnemyAnimationController : MonoBehaviour
         _animator.SetBool(AnimatorData.Params.Grounded, IsGrounded());
     }
 
-    private void SetAnimation()
+    private void SetAnimationRun()
     {
         if(IsGrounded())
             _animator.SetBool(AnimatorData.Params.IsRunning, true);
+    }
+
+    private void SetAnimationHurt()
+    {
+        _animator.SetBool(AnimatorData.Params.Hurt, true);
+    }
+    
+    private void SetAnimationIdle()
+    {
+        _animator.SetBool(AnimatorData.Params.IsRunning, false);
+    }
+    private void SetAnimationAttacking()
+    {
+        _animator.SetBool(AnimatorData.Params.Attack, true);
+    }
+    
+    private void SetAnimationDie()
+    {
+        _animator.SetBool(AnimatorData.Params.Death, true);
     }
 
     private bool IsGrounded()
