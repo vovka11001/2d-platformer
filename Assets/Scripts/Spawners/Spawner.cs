@@ -10,9 +10,9 @@ public class Spawner<T> : MonoBehaviour where T : Component
         if (_spawnPoints == null || _spawnPoints.Length == 0)
             return;
 
-        int coinsCount = _spawnPoints.Length;
+        int count = _spawnPoints.Length;
 
-        for (int i = 0; i < coinsCount; i++)
+        for (int i = 0; i < count; i++)
         {
             var newObject = Instantiate(_prefab, _spawnPoints[i].position, Quaternion.identity);
         }

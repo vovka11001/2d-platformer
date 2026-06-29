@@ -15,4 +15,9 @@ public class Coin : MonoBehaviour
         _collider2D.isTrigger = true;
         transform.localScale = new Vector2(0.2f, 0.2f);
     }
+
+    private void Collect ()
+    {
+
+    }
 }

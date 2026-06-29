@@ -4,7 +4,8 @@ using UnityEngine;
 public class PlayerDetector : Detector<Player>
 {
     [SerializeField] private EnemyMover _enemyMover;
-    
+    [SerializeField] private LayerMask _playerLayer;
+
     private Player _currentPlayer;
     
     public event Action<Player> PlayerChanged;
@@ -18,7 +19,7 @@ public class PlayerDetector : Detector<Player>
     {
         float distance = 5f;
         Vector2 raycastPosition = new Vector2(transform.position.x, transform.position.y + 1f);
-        RaycastHit2D hit = Physics2D.Raycast(raycastPosition, _enemyMover.LookDirection, distance, LayerMask.GetMask("Player"));
+        RaycastHit2D hit = Physics2D.Raycast(raycastPosition, _enemyMover.LookDirection, distance, _playerLayer);
 
         Debug.DrawRay(raycastPosition, _enemyMover.LookDirection * distance, Color.white);
 
