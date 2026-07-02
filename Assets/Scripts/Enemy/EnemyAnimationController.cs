@@ -11,7 +11,7 @@ public class EnemyAnimationController : MonoBehaviour
         _enemy.Hurt += SetAnimationHurt;
         _mover.Runned += SetAnimationRun;
         _mover.StopedMoving += SetAnimationIdle;
-        _mover.Attacking += SetAnimationAttacking;
+        _enemy.Attacking += SetAnimationAttacking;
         _enemy.Death += SetAnimationDie;
     }
 
@@ -20,7 +20,7 @@ public class EnemyAnimationController : MonoBehaviour
         _enemy.Hurt -= SetAnimationHurt;
         _mover.Runned -= SetAnimationRun;
         _mover.StopedMoving -= SetAnimationIdle;
-        _mover.Attacking -= SetAnimationAttacking;
+        _enemy.Attacking -= SetAnimationAttacking;
         _enemy.Death += SetAnimationDie;
     }
 

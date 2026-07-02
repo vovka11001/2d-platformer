@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public class Spawner<T> : MonoBehaviour where T : Component
+public class ItemSpawner : MonoBehaviour
 {
     [SerializeField] private Transform[] _spawnPoints; 
-    [SerializeField] private T _prefab;
+    [SerializeField] private Item _prefab;
+    [SerializeField] private ItemDetector _itemDetector;
     
     private void Start()
     {
@@ -14,7 +15,7 @@ public class Spawner<T> : MonoBehaviour where T : Component
 
         for (int i = 0; i < count; i++)
         {
-            var newObject = Instantiate(_prefab, _spawnPoints[i].position, Quaternion.identity);
+             Instantiate(_prefab, _spawnPoints[i].position, Quaternion.identity);
         }
     }
 }

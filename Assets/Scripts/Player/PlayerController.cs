@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _attackCooldown = 0.5f;
     [SerializeField] private Animator _animator;
     [SerializeField] private InputReader _inputReader;
-    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private Rotator _rotator;
     [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private Player _player;
 
@@ -44,7 +44,6 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         _rigidbody2d = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         _currentEnemies = new List<Enemy>();
     }
     
@@ -53,10 +52,10 @@ public class PlayerController : MonoBehaviour
         if (!_player.IsDead)
         {
             if (_inputReader.HorizontalInput > 0)
-                _spriteRenderer.flipX = true;
+                _rotator.FaceLeft();
             else if (_inputReader.HorizontalInput < 0)
-                _spriteRenderer.flipX = false;
-        
+                _rotator.FaceRight();
+            
             bool isGrounded = IsGrounded();
             bool shouldRun = Mathf.Abs(_inputReader.HorizontalInput) > 0 && isGrounded;
         

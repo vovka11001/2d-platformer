@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private Transform _spawnPoint;
-    [SerializeField] private CoinDetector _coinDetector;
-    [SerializeField] private MedicineChestDetector _medicineChestDetectorDetector;
+    [SerializeField] private ItemDetector _itemDetector;
     
-    private float _deathCooldown = 0.5f;
+    private float _deathCooldown = 1f;
     private List<Coin> _coinsCollected;
     
     private Coroutine _deathCooldownCoroutine;
@@ -23,14 +23,12 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        _coinDetector.TriggerEntered += CollectCoin;
-        _medicineChestDetectorDetector.TriggerEntered += IncreaseHealth;
+        _itemDetector.TriggerEntered += Collect;
     }
 
     private void OnDisable()
     {
-        _coinDetector.TriggerEntered -= CollectCoin;
-        _medicineChestDetectorDetector.TriggerEntered -= IncreaseHealth;
+        _itemDetector.TriggerEntered -= Collect;
     }
     
     private void Start()
@@ -79,13 +77,17 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void CollectCoin(Coin coin)
+    private void Collect(Item item)
     {
-        _coinsCollected.Add(coin);
-    }
-
-    private void IncreaseHealth(MedicineChest medicineChest)
-    {
-        Health += medicineChest.IncreaseAmount;
+        if (item.TryGetComponent(out Coin coin))
+        {
+            _coinsCollected.Add(coin);
+            item.Collect();
+        }
+        else if (item.TryGetComponent(out MedicineChest medicineChest))
+        {
+            Health += medicineChest.IncreaseAmount;
+            medicineChest.Collect();
+        }
     }
 }
