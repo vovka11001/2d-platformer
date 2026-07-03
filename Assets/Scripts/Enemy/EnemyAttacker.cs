@@ -1,68 +1,94 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAttacker : MonoBehaviour
+public class EnemyAttacker : MonoBehaviour, IAttacker
 {
-    [SerializeField] private float _attackCooldown = 2f;
     [SerializeField] private Enemy _enemy;
     [SerializeField] private PlayerDetector _playerDetector;
 
-    private float _attackTimer = 0f;
-    private Player _currentTarget;
+    private float _attackCooldown = 2f;
 
+    private Player _currentTarget;
+    private Coroutine _attackCooldownCoroutine;
+
+    public bool IsAttack { get; private set; }
     public int Damage => _enemy.Damage;
+
+    public event Action Attacked;
 
     private void OnEnable()
     {
         _playerDetector.TriggerEntered += OnPlayerEntered;
-        _playerDetector.TriggerExited += OnPlayerExited;
+        _playerDetector.TriggerExited += PlayerExited;
     }
 
     private void OnDisable()
     {
         _playerDetector.TriggerEntered -= OnPlayerEntered;
-        _playerDetector.TriggerExited -= OnPlayerExited;
+        _playerDetector.TriggerExited -= PlayerExited;
+
+        if (_attackCooldownCoroutine != null)
+            StopCoroutine(_attackCooldownCoroutine);
     }
 
     private void Update()
     {
-        if (_enemy.IsDead || _currentTarget == null || _currentTarget.IsDead) return;
+        if (_enemy.IsDead || _currentTarget == null || _currentTarget.IsDead)
+            return;
 
-        _attackTimer += Time.deltaTime;
-
-        if (_attackTimer >= _attackCooldown)
+        if (IsAttack && _playerDetector.IsOnTriggerEntered)
         {
-            _attackTimer = 0f;
-
-            if (_playerDetector.IsOnTriggerEntered)
-            {
-                Attack(_currentTarget);
-            }
+            Attack(_currentTarget);
         }
     }
 
-    // Реализация IAttacker
     public void Attack(IDamageable target)
     {
-        if (_enemy.IsDead || target == null || target.IsDead) return;
+        if (_enemy.IsDead || target == null || target.IsDead) 
+            return;
 
         target.TakeDamage(Damage);
-        Debug.Log($"Враг атакует! Урон: {Damage}");
+        Attacked?.Invoke();
+
+        IsAttack = false;
+
+        if (_attackCooldownCoroutine != null)
+            StopCoroutine(_attackCooldownCoroutine);
+
+        _attackCooldownCoroutine = StartCoroutine(AttackCooldown());
+    }
+
+    private IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(_attackCooldown);
+        IsAttack = true;
+        _attackCooldownCoroutine = null;
+
+        if (_currentTarget != null && !_currentTarget.IsDead && _playerDetector.IsOnTriggerEntered)
+        {
+            Attack(_currentTarget);
+        }
     }
 
     private void OnPlayerEntered(Player player)
     {
         _currentTarget = player;
-        _attackTimer = _attackCooldown; // Мгновенная атака при входе
+        IsAttack = true;
     }
 
-    private void OnPlayerExited(Player player)
+    private void PlayerExited(Player player)
     {
         if (_currentTarget == player)
         {
             _currentTarget = null;
-            _attackTimer = 0f;
+            IsAttack = false;
+
+            if (_attackCooldownCoroutine != null)
+            {
+                StopCoroutine(_attackCooldownCoroutine);
+                _attackCooldownCoroutine = null;
+            }
         }
     }
 }

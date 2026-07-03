@@ -1,5 +1,5 @@
 public interface IAttacker
 {
-    void Attack();
+    void Attack(IDamageable target);
     int Damage { get; }
 }

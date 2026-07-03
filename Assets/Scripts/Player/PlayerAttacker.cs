@@ -1,7 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 
 public class PlayerAttacker : MonoBehaviour, IAttacker
@@ -9,6 +8,7 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
     [SerializeField] private float _attackCooldown = 0.5f;
     [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private Player _player;
+    [SerializeField] private InputReader _inputReader;
 
     private bool _canAttack = true;
     private int _damage = 20;
@@ -18,14 +18,18 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 
     public int Damage => _damage;
 
+    public event Action Attacked;
+
     private void OnEnable()
     {
+        _inputReader.Attacked += PerformAttack;
         _enemyDetector.TriggerEntered += AddEnemy;
         _enemyDetector.TriggerExited += RemoveEnemy;
     }
 
     private void OnDisable()
     {
+        _inputReader.Attacked -= PerformAttack;
         _enemyDetector.TriggerEntered -= AddEnemy;
         _enemyDetector.TriggerExited -= RemoveEnemy;
     }
@@ -36,7 +40,7 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
             return;
 
         _canAttack = false;
-
+        Attacked?. Invoke();
         _currentEnemies.RemoveAll(enemy => enemy == null || enemy.IsDead);
 
         foreach (var enemy in _currentEnemies)
