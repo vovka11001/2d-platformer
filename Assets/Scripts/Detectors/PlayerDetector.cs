@@ -43,15 +43,15 @@ public class PlayerDetector : Detector<Player>
         {
             ReleaseTargetPlayer();
         }
+    }
 
-        void ReleaseTargetPlayer()
+    private void ReleaseTargetPlayer()
+    {
+        if (_currentPlayer != null)
         {
-            if (_currentPlayer != null)
-            {
-                PlayerChanged?.Invoke(null);
-            }
-
-            _currentPlayer = null;
+            PlayerChanged?.Invoke(null);
         }
+
+        _currentPlayer = null;
     }
 }

@@ -10,12 +10,14 @@ public class EnemyMover : MonoBehaviour
     [SerializeField] private Rotator _rotator;
     [SerializeField] private PlayerDetector _playerDetector;
     [SerializeField] private Enemy _enemy;
-    
+    [SerializeField] private EnemyAnimationController _animationController;
+
+    private bool _isMoving = true;
+
     private Transform _targetTransform;
     private Rigidbody2D _rigidbody2d;
 
     public Player PlayerTarget {get; private set;}
-    public bool IsMoving { get; private set; } = true;
     public Vector2 LookDirection { get; private set; }
 
     public event UnityAction Runned;
@@ -48,7 +50,7 @@ public class EnemyMover : MonoBehaviour
     
     private void FixedUpdate()
     {
-        if (IsMoving && !_enemy.IsAttacking && !_enemy.IsDead && _targetTransform != null)
+        if (_isMoving && !_enemy.IsAttacking && !_enemy.IsDead && _targetTransform != null)
         {
             _rigidbody2d.position = Vector2.MoveTowards(_rigidbody2d.position, _targetTransform.position, _speed * Time.fixedDeltaTime);
         }
@@ -61,7 +63,12 @@ public class EnemyMover : MonoBehaviour
         
         if(_enemy.IsDead)
             return;
-        
+
+        if (_isMoving)
+            _animationController.SetAnimationRun();
+        else
+            _animationController.SetAnimationIdle();
+
         if (ReachedTarget())
         {
             SetTarget();
@@ -102,13 +109,13 @@ public class EnemyMover : MonoBehaviour
     private void StopMoving(Player player)
     {
         PlayerTarget = player;
-        IsMoving = false;
+        _isMoving = false;
         StopedMoving?.Invoke();
     }
     
     private void StartMoving(Player player)
     {
-        IsMoving = true;
+        _isMoving = true;
         
         if (PlayerTarget != null && PlayerTarget == player)
         {

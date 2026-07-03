@@ -9,8 +9,6 @@ public class EnemyAnimationController : MonoBehaviour
     private void OnEnable()
     {
         _enemy.Hurt += SetAnimationHurt;
-        _mover.Runned += SetAnimationRun;
-        _mover.StopedMoving += SetAnimationIdle;
         _enemy.Attacking += SetAnimationAttacking;
         _enemy.Death += SetAnimationDie;
     }
@@ -18,8 +16,6 @@ public class EnemyAnimationController : MonoBehaviour
     private void OnDisable()
     {
         _enemy.Hurt -= SetAnimationHurt;
-        _mover.Runned -= SetAnimationRun;
-        _mover.StopedMoving -= SetAnimationIdle;
         _enemy.Attacking -= SetAnimationAttacking;
         _enemy.Death += SetAnimationDie;
     }
@@ -34,32 +30,32 @@ public class EnemyAnimationController : MonoBehaviour
         _animator.SetBool(AnimatorData.Params.Grounded, IsGrounded());
     }
 
-    private void SetAnimationRun()
+    public void SetAnimationRun()
     {
         if(IsGrounded())
             _animator.SetBool(AnimatorData.Params.IsRunning, true);
     }
 
-    private void SetAnimationHurt()
+    public void SetAnimationHurt()
     {
         _animator.SetBool(AnimatorData.Params.Hurt, true);
     }
     
-    private void SetAnimationIdle()
+    public void SetAnimationIdle()
     {
         _animator.SetBool(AnimatorData.Params.IsRunning, false);
     }
-    private void SetAnimationAttacking()
+    public void SetAnimationAttacking()
     {
         _animator.SetBool(AnimatorData.Params.Attack, true);
     }
     
-    private void SetAnimationDie()
+    public void SetAnimationDie()
     {
         _animator.SetBool(AnimatorData.Params.Death, true);
     }
 
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         float distance = 0.1f;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distance);
