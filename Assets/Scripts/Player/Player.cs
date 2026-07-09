@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 
 public class Player : MonoBehaviour, IDamageable
@@ -16,15 +15,18 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private AnimationController _animationController;
     [SerializeField] private PlayerAttacker _playerAttacker;
+    [SerializeField] private PlayerMover _playerMover;
+    [SerializeField] private PlayerJump _playerJump;
+    [SerializeField] private GroundDetector _groundDetector;
 
     private float _deathCooldown = 1f;
+    
     private List<Coin> _coinsCollected;
     private List<Enemy> _currentEnemies;
 
-    private Rigidbody2D _rigidbody2d;
     private Coroutine _deathCooldownCoroutine;
 
-    public bool IsDead { get; private set; } = false;
+    public bool IsDead { get; private set; }
     public int Health { get; private set; } = 100;
 
     private void OnEnable()
@@ -47,7 +49,6 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Awake()
     {
-        _rigidbody2d = GetComponent<Rigidbody2D>();
         _currentEnemies = new List<Enemy>();
     }
 
@@ -66,7 +67,7 @@ public class Player : MonoBehaviour, IDamageable
             else if (_inputReader.HorizontalInput < 0)
                 _rotator.FaceRight();
 
-            bool isGrounded = IsGrounded();
+            bool isGrounded = _groundDetector.IsGrounded();
             bool shouldRun = Mathf.Abs(_inputReader.HorizontalInput) > 0 && isGrounded;
 
             _animationController.SetAnimationRun(shouldRun);
@@ -77,7 +78,7 @@ public class Player : MonoBehaviour, IDamageable
     private void FixedUpdate()
     {
         if (!IsDead)
-            _rigidbody2d.velocity = new Vector2(_inputReader.HorizontalInput * _speed, _rigidbody2d.velocity.y);
+            _playerMover.Run(_inputReader.HorizontalInput * _speed);
     }
 
     public void TakeDamage(int damage)
@@ -102,20 +103,8 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Jump()
     {
-        if (IsGrounded() && !IsDead)
-        {
-            _rigidbody2d.velocity = new Vector2(_rigidbody2d.velocity.x, _jumpForce);
-        }
-    }
-
-    private bool IsGrounded()
-    {
-        if (IsDead)
-            return false;
-
-        float distance = 0.1f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distance);
-        return hit.collider != null;
+        if (_groundDetector.IsGrounded() && !IsDead)
+            _playerJump.Jump(_jumpForce);
     }
 
     private void AddEnemy(Enemy enemy)
@@ -136,6 +125,7 @@ public class Player : MonoBehaviour, IDamageable
             return;
 
         IsDead = true;
+        _playerAttacker.SetAttackFalse();
 
         if (_deathCooldownCoroutine != null)
             StopCoroutine(_deathCooldownCoroutine);

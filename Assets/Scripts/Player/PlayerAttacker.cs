@@ -7,7 +7,6 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 {
     [SerializeField] private float _attackCooldown = 0.5f;
     [SerializeField] private EnemyDetector _enemyDetector;
-    [SerializeField] private Player _player;
     [SerializeField] private InputReader _inputReader;
 
     private bool _canAttack = true;
@@ -15,11 +14,10 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 
     private List<IDamageable> _currentEnemies = new List<IDamageable>();
     private Coroutine _attackCooldownCoroutine;
-
-    public int Damage => _damage;
-
     public event Action Attacked;
 
+    public int Damage => _damage;
+    
     private void OnEnable()
     {
         _inputReader.Attacked += PerformAttack;
@@ -36,7 +34,7 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 
     public void PerformAttack()
     {
-        if (!_canAttack || _player.IsDead)
+        if (!_canAttack)
             return;
 
         _canAttack = false;
@@ -59,10 +57,15 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 
     public void Attack(IDamageable target)
     {
-        if (_player.IsDead || target == null || target.IsDead) 
+        if (target == null || target.IsDead) 
             return;
 
         target.TakeDamage(Damage);
+    }
+
+    public void SetAttackFalse()
+    {
+        _canAttack = false;
     }
 
     private IEnumerator AttackCooldown()

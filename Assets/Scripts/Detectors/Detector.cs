@@ -11,9 +11,10 @@ public class Detector<T> : MonoBehaviour
     private BoxCollider2D _collider;
     private T _detectedComponent;
     
-    public bool IsOnTriggerEntered { get; private set; }
     public event Action<T> TriggerEntered;
     public event Action<T> TriggerExited; 
+    
+    public bool IsOnTriggerEntered { get; private set; }
 
     private void Awake()
     {

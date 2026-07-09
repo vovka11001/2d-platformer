@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemyAttacker : MonoBehaviour, IAttacker
 {
-    [SerializeField] private Enemy _enemy;
     [SerializeField] private PlayerDetector _playerDetector;
 
     private float _attackCooldown = 2f;
@@ -12,11 +11,11 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     private Player _currentTarget;
     private Coroutine _attackCooldownCoroutine;
 
-    public bool IsAttack { get; private set; }
-    public int Damage => _enemy.Damage;
-
     public event Action Attacked;
 
+    public bool IsAttack { get; private set; }
+    public int Damage { get; private set; } = 20;
+    
     private void OnEnable()
     {
         _playerDetector.TriggerEntered += OnPlayerEntered;
@@ -34,18 +33,21 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
 
     private void Update()
     {
-        if (_enemy.IsDead || _currentTarget == null || _currentTarget.IsDead)
+        if (_currentTarget == null || _currentTarget.IsDead)
             return;
 
         if (IsAttack && _playerDetector.IsOnTriggerEntered)
-        {
             Attack(_currentTarget);
-        }
+    }
+
+    public void SetAttackFalse()
+    {
+        IsAttack = false;
     }
 
     public void Attack(IDamageable target)
     {
-        if (_enemy.IsDead || target == null || target.IsDead) 
+        if (target == null || target.IsDead) 
             return;
 
         target.TakeDamage(Damage);
@@ -66,9 +68,7 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
         _attackCooldownCoroutine = null;
 
         if (_currentTarget != null && !_currentTarget.IsDead && _playerDetector.IsOnTriggerEntered)
-        {
             Attack(_currentTarget);
-        }
     }
 
     private void OnPlayerEntered(Player player)

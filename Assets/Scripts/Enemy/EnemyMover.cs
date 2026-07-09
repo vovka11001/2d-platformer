@@ -8,8 +8,6 @@ public class EnemyMover : MonoBehaviour
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private Rotator _rotator;
     [SerializeField] private PlayerDetector _playerDetector;
-    [SerializeField] private Enemy _enemy;
-    [SerializeField] private EnemyAttacker _enemyAttacker;
 
     private Transform _targetTransform;
     private Rigidbody2D _rigidbody2d;
@@ -45,7 +43,7 @@ public class EnemyMover : MonoBehaviour
     
     private void FixedUpdate()
     {
-        if (IsMoving && !_enemyAttacker.IsAttack && !_enemy.IsDead && _targetTransform != null)
+        if (IsMoving && _targetTransform != null)
         {
             _rigidbody2d.position = Vector2.MoveTowards(_rigidbody2d.position, _targetTransform.position, _speed * Time.fixedDeltaTime);
         }
@@ -54,9 +52,6 @@ public class EnemyMover : MonoBehaviour
     private void Update()
     {
         if (_targetTransform == null) 
-            return;
-        
-        if(_enemy.IsDead)
             return;
 
         if (ReachedTarget())
@@ -67,15 +62,32 @@ public class EnemyMover : MonoBehaviour
         lookDirection.y = 0;
         LookDirection = lookDirection;
         const float offset = 0.001f;
-
-        if (LookDirection.x > 0)
-            _rotator.FaceLeft(); 
-
-        else if (LookDirection.x < 0)
-            _rotator.FaceRight(); 
-
-        if (offsetVector.sqrMagnitude > offset && !_enemyAttacker.IsAttack)
+        
+        if (offsetVector.sqrMagnitude > offset)
             _rotator.FaceDirection(LookDirection);
+    }
+
+    public void SetMovingFalse()
+    {
+        IsMoving = false;
+    }
+    
+    public void RotateRight()
+    {
+        if (_rotator != null)
+            _rotator.FaceRight();
+    }
+
+    public void RotateLeft()
+    {
+        if (_rotator != null)
+            _rotator.FaceLeft();
+    }
+
+    public void RotateDirection(Vector2 direction)
+    {
+        if (_rotator != null)
+            _rotator.FaceDirection(direction);
     }
 
     private void UpdatePlayerTarget(Player player)

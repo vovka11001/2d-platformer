@@ -6,13 +6,13 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private EnemyAttacker _enemyAttacker;
     [SerializeField] private EnemyMover _enemyMover;
     [SerializeField] private AnimationController _animationController;
-
+    [SerializeField] private GroundDetector _groundDetector;
+    
     private float _deathCooldown = 1.5f;
 
     private Coroutine _deathCooldownCoroutine;
 
     public int Health { get; private set; } = 100;
-    public int Damage { get; private set; } = 20;
     public bool IsDead { get; private set; }
 
     private void OnEnable()
@@ -32,7 +32,18 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        _animationController.SetAnimationRun(_enemyMover.IsMoving && !_enemyAttacker.IsAttack);
+        bool isGrounded = _groundDetector.IsGrounded();
+        
+        _animationController.SetGrounded(isGrounded);
+        _animationController.SetAnimationRun(_enemyMover.IsMoving);
+
+        if (!IsDead)
+        {
+            if (_enemyMover.LookDirection.x > 0)
+                _enemyMover.RotateLeft();
+            else if (_enemyMover.LookDirection.x < 0)
+                _enemyMover.RotateRight();
+        }
     }
 
     public void TakeDamage(int damage)
@@ -57,6 +68,9 @@ public class Enemy : MonoBehaviour, IDamageable
         _animationController.SetAnimationDie();
         IsDead = true;
 
+        _enemyMover.SetMovingFalse();
+        _enemyAttacker.SetAttackFalse();
+        
         if (_deathCooldownCoroutine != null)
             StopCoroutine(_deathCooldownCoroutine);
 
