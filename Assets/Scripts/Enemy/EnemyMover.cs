@@ -84,12 +84,6 @@ public class EnemyMover : MonoBehaviour
             _rotator.FaceLeft();
     }
 
-    public void RotateDirection(Vector2 direction)
-    {
-        if (_rotator != null)
-            _rotator.FaceDirection(direction);
-    }
-
     private void UpdatePlayerTarget(Player player)
     {
         PlayerTarget = player;
