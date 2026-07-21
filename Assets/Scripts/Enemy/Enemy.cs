@@ -5,8 +5,10 @@ public class Enemy : MonoBehaviour, IDamageable
 {
     [SerializeField] private EnemyAttacker _enemyAttacker;
     [SerializeField] private EnemyMover _enemyMover;
+    [SerializeField] private EnemyPatrol _enemyPatrol;
     [SerializeField] private AnimationController _animationController;
     [SerializeField] private GroundDetector _groundDetector;
+    [SerializeField] private AnimatorEventHandler _animatorEventHandler;
     
     private float _deathCooldown = 1.5f;
 
@@ -17,17 +19,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void OnEnable()
     {
-        _enemyAttacker.Attacked += PlayAnimationAttack;
+        _animatorEventHandler.Attacked += _enemyAttacker.Attack;
+        _enemyAttacker.AttackRequested += _animationController.SetAnimationAttacking;
     }
 
     private void OnDisable()
     {
-        _enemyAttacker.Attacked -= PlayAnimationAttack;
-    }
-
-    private void PlayAnimationAttack()
-    {
-        _animationController.SetAnimationAttacking();
+        _animatorEventHandler.Attacked -= _enemyAttacker.Attack;
+        _enemyAttacker.AttackRequested -= _animationController.SetAnimationAttacking;
     }
 
     private void Update()
@@ -39,11 +38,13 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (!IsDead)
         {
-            if (_enemyMover.LookDirection.x > 0)
-                _enemyMover.RotateLeft();
-            else if (_enemyMover.LookDirection.x < 0)
-                _enemyMover.RotateRight();
+            if (_enemyPatrol.LookDirection.x > 0)
+                _enemyPatrol.RotateLeft();
+            else if (_enemyPatrol.LookDirection.x < 0)
+                _enemyPatrol.RotateRight();
         }
+
+        _enemyMover.SetTarget(_enemyPatrol.TargetTransform);
     }
 
     public void TakeDamage(int damage)

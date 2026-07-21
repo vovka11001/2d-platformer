@@ -6,12 +6,12 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
 {
     [SerializeField] private PlayerDetector _playerDetector;
 
-    private float _attackCooldown = 2f;
+    private float _attackCooldown = 1f;
 
     private Player _currentTarget;
     private Coroutine _attackCooldownCoroutine;
 
-    public event Action Attacked;
+    public event Action AttackRequested;
 
     public bool IsAttack { get; private set; }
     public int Damage { get; private set; } = 20;
@@ -26,9 +26,6 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     {
         _playerDetector.TriggerEntered -= OnPlayerEntered;
         _playerDetector.TriggerExited -= PlayerExited;
-
-        if (_attackCooldownCoroutine != null)
-            StopCoroutine(_attackCooldownCoroutine);
     }
 
     private void Update()
@@ -37,40 +34,9 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
             return;
 
         if (IsAttack && _playerDetector.IsOnTriggerEntered)
-            Attack(_currentTarget);
+            RequestAttack();
     }
-
-    public void SetAttackFalse()
-    {
-        IsAttack = false;
-    }
-
-    public void Attack(IDamageable target)
-    {
-        if (target == null || target.IsDead) 
-            return;
-
-        target.TakeDamage(Damage);
-        Attacked?.Invoke();
-
-        IsAttack = false;
-
-        if (_attackCooldownCoroutine != null)
-            StopCoroutine(_attackCooldownCoroutine);
-
-        _attackCooldownCoroutine = StartCoroutine(AttackCooldown());
-    }
-
-    private IEnumerator AttackCooldown()
-    {
-        yield return new WaitForSeconds(_attackCooldown);
-        IsAttack = true;
-        _attackCooldownCoroutine = null;
-
-        if (_currentTarget != null && !_currentTarget.IsDead && _playerDetector.IsOnTriggerEntered)
-            Attack(_currentTarget);
-    }
-
+    
     private void OnPlayerEntered(Player player)
     {
         _currentTarget = player;
@@ -90,5 +56,38 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
                 _attackCooldownCoroutine = null;
             }
         }
+    }
+
+    public void SetAttackFalse()
+    {
+        IsAttack = false;
+    }
+
+    public void Attack()
+    {
+        if (_currentTarget == null || _currentTarget.IsDead) 
+            return;
+
+        _currentTarget.TakeDamage(Damage);
+    }
+    
+    private void RequestAttack()
+    {
+        IsAttack = false;
+        
+        AttackRequested?.Invoke();
+        
+        if (_attackCooldownCoroutine != null)
+            StopCoroutine(_attackCooldownCoroutine);
+        
+        _attackCooldownCoroutine = StartCoroutine(AttackCooldown());
+    }
+
+    private IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(_attackCooldown);
+        IsAttack = true;
+        _attackCooldownCoroutine = null;
+        RequestAttack();
     }
 }

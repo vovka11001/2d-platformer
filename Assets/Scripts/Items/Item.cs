@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent (typeof(CircleCollider2D))]
@@ -5,6 +6,8 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     private CircleCollider2D _collider2D;
+    
+    public event Action<Item> Collected;
     private void Awake()
     {
         _collider2D = GetComponent<CircleCollider2D>();
@@ -18,6 +21,6 @@ public class Item : MonoBehaviour
 
     public void Collect()
     {
-        Destroy(gameObject);
+        Collected?.Invoke(this);
     }
 }

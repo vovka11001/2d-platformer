@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAttacker : MonoBehaviour, IAttacker
@@ -12,59 +11,69 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
     private bool _canAttack = true;
     private int _damage = 20;
 
-    private List<IDamageable> _currentEnemies = new List<IDamageable>();
+    private Enemy _currentTarget;
     private Coroutine _attackCooldownCoroutine;
-    public event Action Attacked;
+
+    public event Action AttackRequested;
 
     public int Damage => _damage;
     
     private void OnEnable()
     {
-        _inputReader.Attacked += PerformAttack;
-        _enemyDetector.TriggerEntered += AddEnemy;
-        _enemyDetector.TriggerExited += RemoveEnemy;
+        _inputReader.Attacked += RequestAttack;
+        _enemyDetector.TriggerEntered += EnemyEntered;
+        _enemyDetector.TriggerExited += EnemyExited;
     }
 
     private void OnDisable()
     {
-        _inputReader.Attacked -= PerformAttack;
-        _enemyDetector.TriggerEntered -= AddEnemy;
-        _enemyDetector.TriggerExited -= RemoveEnemy;
+        _inputReader.Attacked += RequestAttack;
+        _enemyDetector.TriggerEntered -= EnemyEntered;
+        _enemyDetector.TriggerExited -= EnemyExited;
     }
 
-    public void PerformAttack()
+    public void Attack()
+    {
+        if (_currentTarget == null || _currentTarget.IsDead) 
+            return;
+        
+        _currentTarget.TakeDamage(Damage);
+    }
+    
+    private void RequestAttack()
     {
         if (!_canAttack)
             return;
-
+        
         _canAttack = false;
-        Attacked?. Invoke();
-        _currentEnemies.RemoveAll(enemy => enemy == null || enemy.IsDead);
-
-        foreach (var enemy in _currentEnemies)
-        {
-            if (enemy != null && !enemy.IsDead)
-            {
-                Attack(enemy);
-            }
-        }
-
+        
+        AttackRequested?.Invoke();
+        
         if (_attackCooldownCoroutine != null)
             StopCoroutine(_attackCooldownCoroutine);
-
+        
         _attackCooldownCoroutine = StartCoroutine(AttackCooldown());
     }
-
-    public void Attack(IDamageable target)
+    
+    private void EnemyEntered(Enemy enemy)
     {
-        if (target == null || target.IsDead) 
-            return;
+        _currentTarget = enemy;
+    }
 
-        target.TakeDamage(Damage);
+    private void EnemyExited(Enemy enemy)
+    {
+        if (_currentTarget == enemy)
+            _currentTarget = null;
     }
 
     public void SetAttackFalse()
     {
+        if (_attackCooldownCoroutine != null)
+        {
+            StopCoroutine(_attackCooldownCoroutine);
+            _attackCooldownCoroutine = null;
+        }
+        
         _canAttack = false;
     }
 
@@ -73,17 +82,5 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
         yield return new WaitForSeconds(_attackCooldown);
         _canAttack = true;
         _attackCooldownCoroutine = null;
-    }
-
-    private void AddEnemy(Enemy enemy)
-    {
-        if (enemy != null && !_currentEnemies.Contains(enemy))
-            _currentEnemies.Add(enemy);
-    }
-
-    private void RemoveEnemy(Enemy enemy)
-    {
-        if (_currentEnemies.Contains(enemy))
-            _currentEnemies.Remove(enemy);
     }
 }

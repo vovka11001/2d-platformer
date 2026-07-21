@@ -6,24 +6,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, IDamageable
 {
-    [SerializeField] private float _speed = 5f;
-    [SerializeField] private float _jumpForce = 10f;
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private ItemDetector _itemDetector;
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private Rotator _rotator;
-    [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private AnimationController _animationController;
+    [SerializeField] private AnimatorEventHandler _animatorEventHandler;
     [SerializeField] private PlayerAttacker _playerAttacker;
     [SerializeField] private PlayerMover _playerMover;
     [SerializeField] private PlayerJump _playerJump;
     [SerializeField] private GroundDetector _groundDetector;
-
+    
+    private float _speed = 5f;
+    private float _jumpForce = 10f;
     private float _deathCooldown = 1f;
     
     private List<Coin> _coinsCollected;
-    private List<Enemy> _currentEnemies;
-
     private Coroutine _deathCooldownCoroutine;
 
     public bool IsDead { get; private set; }
@@ -32,24 +30,17 @@ public class Player : MonoBehaviour, IDamageable
     private void OnEnable()
     {
         _itemDetector.TriggerEntered += Collect;
-        _enemyDetector.TriggerEntered += AddEnemy;
-        _enemyDetector.TriggerExited += RemoveEnemy;
         _inputReader.Jumped += Jump;
-        _playerAttacker.Attacked += PlayAttackAnimation;
+        _playerAttacker.AttackRequested += PlayAttackAnimation;
+        _animatorEventHandler.Attacked += _playerAttacker.Attack;
     }
 
     private void OnDisable()
     {
         _itemDetector.TriggerEntered -= Collect;
-        _enemyDetector.TriggerEntered -= AddEnemy;
-        _enemyDetector.TriggerExited -= RemoveEnemy;
         _inputReader.Jumped -= Jump;
-        _playerAttacker.Attacked -= PlayAttackAnimation;
-    }
-
-    private void Awake()
-    {
-        _currentEnemies = new List<Enemy>();
+        _playerAttacker.AttackRequested -= PlayAttackAnimation;
+        _animatorEventHandler.Attacked -= _playerAttacker.Attack;
     }
 
     private void Start()
@@ -98,25 +89,14 @@ public class Player : MonoBehaviour, IDamageable
 
     private void PlayAttackAnimation()
     {
-        _animationController.SetAnimationAttacking();
+        if (!IsDead)
+            _animationController.SetAnimationAttacking();
     }
 
     private void Jump()
     {
         if (_groundDetector.IsGrounded() && !IsDead)
             _playerJump.Jump(_jumpForce);
-    }
-
-    private void AddEnemy(Enemy enemy)
-    {
-        if (enemy != null && !_currentEnemies.Contains(enemy))
-            _currentEnemies.Add(enemy);
-    }
-
-    private void RemoveEnemy(Enemy enemy)
-    {
-        if (_currentEnemies.Contains(enemy))
-            _currentEnemies.Remove(enemy);
     }
 
     private void Die()

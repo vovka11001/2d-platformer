@@ -11,11 +11,21 @@ public class ItemSpawner : MonoBehaviour
         if (_spawnPoints == null || _spawnPoints.Length == 0)
             return;
 
-        int count = _spawnPoints.Length;
-
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < _spawnPoints.Length; i++)
         {
-             Instantiate(_prefab, _spawnPoints[i].position, Quaternion.identity);
+            SpawnItem(i);
         }
+    }
+
+    private void SpawnItem(int index)
+    {
+        Item newItem = Instantiate(_prefab, _spawnPoints[index].position, Quaternion.identity);
+        newItem.Collected += DestroyItem;
+    }
+    
+    private void DestroyItem(Item item)
+    {
+        item.Collected -= DestroyItem;
+        Destroy(item.gameObject);
     }
 }
