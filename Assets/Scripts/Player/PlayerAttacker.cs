@@ -27,7 +27,7 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 
     private void OnDisable()
     {
-        _inputReader.Attacked += RequestAttack;
+        _inputReader.Attacked -= RequestAttack;
         _enemyDetector.TriggerEntered -= EnemyEntered;
         _enemyDetector.TriggerExited -= EnemyExited;
     }

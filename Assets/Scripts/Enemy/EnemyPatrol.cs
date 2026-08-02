@@ -38,6 +38,12 @@ public class EnemyPatrol : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerTarget != null && PlayerTarget.IsDead)
+        {
+            PlayerTarget = null;
+            SetTarget();
+        }
+
         if (TargetTransform == null) 
             return;
 

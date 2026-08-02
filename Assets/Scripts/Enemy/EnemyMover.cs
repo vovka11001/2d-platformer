@@ -24,7 +24,7 @@ public class EnemyMover : MonoBehaviour
 
     private void Update()
     {
-        if (_playerDetector.IsOnTriggerEntered)
+        if (_playerDetector.IsOnTriggerEntered || _targetTransform == null)
             IsMoving = false;
         else
             IsMoving = true;

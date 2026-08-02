@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private AnimationController _animationController;
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private AnimatorEventHandler _animatorEventHandler;
+    [SerializeField] private PlayerDetector _playerDetector;
     
     private float _deathCooldown = 1.5f;
 
@@ -44,6 +45,7 @@ public class Enemy : MonoBehaviour, IDamageable
                 _enemyPatrol.RotateRight();
         }
 
+        _playerDetector.SetDirection(_enemyPatrol.LookDirection);
         _enemyMover.SetTarget(_enemyPatrol.TargetTransform);
     }
 
