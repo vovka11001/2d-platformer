@@ -58,11 +58,6 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
         }
     }
 
-    public void SetAttackFalse()
-    {
-        IsAttack = false;
-    }
-
     public void Attack()
     {
         if (_currentTarget == null || _currentTarget.IsDead) 

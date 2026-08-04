@@ -6,7 +6,6 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
 {
     [SerializeField] private float _attackCooldown = 0.5f;
     [SerializeField] private EnemyDetector _enemyDetector;
-    [SerializeField] private InputReader _inputReader;
 
     private bool _canAttack = true;
     private int _damage = 20;
@@ -20,14 +19,12 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
     
     private void OnEnable()
     {
-        _inputReader.Attacked += RequestAttack;
         _enemyDetector.TriggerEntered += EnemyEntered;
         _enemyDetector.TriggerExited += EnemyExited;
     }
 
     private void OnDisable()
     {
-        _inputReader.Attacked -= RequestAttack;
         _enemyDetector.TriggerEntered -= EnemyEntered;
         _enemyDetector.TriggerExited -= EnemyExited;
     }
@@ -40,7 +37,7 @@ public class PlayerAttacker : MonoBehaviour, IAttacker
         _currentTarget.TakeDamage(Damage);
     }
     
-    private void RequestAttack()
+    public void RequestAttack()
     {
         if (!_canAttack)
             return;

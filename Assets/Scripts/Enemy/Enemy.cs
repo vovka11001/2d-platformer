@@ -71,8 +71,15 @@ public class Enemy : MonoBehaviour, IDamageable
         _animationController.SetAnimationDie();
         IsDead = true;
 
-        _enemyMover.SetMovingFalse();
-        _enemyAttacker.SetAttackFalse();
+        _enemyMover.enabled = false;
+        _enemyAttacker.enabled = false;
+        _enemyPatrol.enabled = false;
+        
+        if (TryGetComponent(out Rigidbody2D rigidbody2d))
+        {
+            rigidbody2d.velocity = Vector2.zero;
+            rigidbody2d.bodyType = RigidbodyType2D.Kinematic;
+        }
         
         if (_deathCooldownCoroutine != null)
             StopCoroutine(_deathCooldownCoroutine);

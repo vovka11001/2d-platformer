@@ -10,9 +10,9 @@ public class MenuManager : MonoBehaviour
         SceneManager.LoadScene(_gameSceneName);
     }
 
-    public void OpenSettings()
+    public void ShowAuthor()
     {
-        Debug.Log("Открыть настройки");
+        Debug.Log("РўР°Рє РЅР°Р·С‹РІР°РµРјС‹Р№ Р°РІС‚РѕСЂ");
     }
 
     public void ExitGame()

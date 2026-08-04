@@ -39,11 +39,6 @@ public class EnemyMover : MonoBehaviour
         }
     }
 
-    public void SetMovingFalse()
-    {
-        IsMoving = false;
-    }
-
     public void SetTarget(Transform targetTransform)
     { 
         _targetTransform = targetTransform;

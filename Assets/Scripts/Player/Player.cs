@@ -31,6 +31,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         _itemDetector.TriggerEntered += Collect;
         _inputReader.Jumped += Jump;
+        _inputReader.Attacked += _playerAttacker.RequestAttack;
         _playerAttacker.AttackRequested += PlayAttackAnimation;
         _animatorEventHandler.Attacked += _playerAttacker.Attack;
     }
@@ -39,6 +40,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         _itemDetector.TriggerEntered -= Collect;
         _inputReader.Jumped -= Jump;
+        _inputReader.Attacked -= _playerAttacker.RequestAttack;
         _playerAttacker.AttackRequested -= PlayAttackAnimation;
         _animatorEventHandler.Attacked -= _playerAttacker.Attack;
     }
