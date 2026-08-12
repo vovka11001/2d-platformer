@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,8 +25,16 @@ public class Player : MonoBehaviour, IDamageable
     private List<Coin> _coinsCollected;
     private Coroutine _deathCooldownCoroutine;
 
+    public event Action<int, int> HealthChanged;
+
     public bool IsDead { get; private set; }
-    public int Health { get; private set; } = 100;
+    public int Health { get; private set; }
+    public int MaxHealth { get; private set; } = 100;
+
+    private void Awake()
+    {
+        Health = MaxHealth;
+    }
 
     private void OnEnable()
     {
@@ -81,6 +90,7 @@ public class Player : MonoBehaviour, IDamageable
 
         Health -= damage;
         _animationController.SetAnimationHurt();
+        HealthChanged?.Invoke(Health, MaxHealth);
 
         if (Health <= 0)
         {
@@ -130,7 +140,8 @@ public class Player : MonoBehaviour, IDamageable
         }
         else if (item.TryGetComponent(out MedicineChest medicineChest))
         {
-            Health += medicineChest.IncreaseAmount;
+            Health = Mathf.Min(Health + medicineChest.IncreaseAmount, MaxHealth);
+            HealthChanged?.Invoke(Health, MaxHealth);
             medicineChest.Collect();
         }
     }

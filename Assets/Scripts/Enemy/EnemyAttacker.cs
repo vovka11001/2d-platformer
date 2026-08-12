@@ -26,6 +26,15 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     {
         _playerDetector.TriggerEntered -= OnPlayerEntered;
         _playerDetector.TriggerExited -= PlayerExited;
+        
+        if (_attackCooldownCoroutine != null)
+        {
+            StopCoroutine(_attackCooldownCoroutine);
+            _attackCooldownCoroutine = null;
+        }
+
+        IsAttack = false;
+        _currentTarget = null;
     }
 
     private void Update()

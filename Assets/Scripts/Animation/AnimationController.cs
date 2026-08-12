@@ -22,7 +22,7 @@ public class AnimationController : MonoBehaviour
     
     public void SetAnimationAttacking()
     {
-        _animator.SetBool(AnimatorData.Params.Attack, true);
+        _animator.SetTrigger(AnimatorData.Params.Attack);
     }
     
     public void SetAnimationDie()

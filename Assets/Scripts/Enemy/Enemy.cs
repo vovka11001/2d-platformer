@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -14,9 +15,16 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _deathCooldown = 1.5f;
 
     private Coroutine _deathCooldownCoroutine;
+    public event Action<int, int> HealthChanged;
 
-    public int Health { get; private set; } = 100;
+    public int Health { get; private set; }
+    public int MaxHealth { get; private set; } = 100;
     public bool IsDead { get; private set; }
+
+    private void Awake()
+    {
+        Health = MaxHealth;
+    }
 
     private void OnEnable()
     {
@@ -56,31 +64,25 @@ public class Enemy : MonoBehaviour, IDamageable
 
         Health -= damage;
         _animationController.SetAnimationHurt();
+        HealthChanged?.Invoke(Health, MaxHealth);
 
         if (Health <= 0)
-        {
             DestroyEnemy();
-        }
     }
 
     private void DestroyEnemy()
     {
         if (IsDead)
             return;
-
-        _animationController.SetAnimationDie();
-        IsDead = true;
-
+        
         _enemyMover.enabled = false;
         _enemyAttacker.enabled = false;
         _enemyPatrol.enabled = false;
         
-        if (TryGetComponent(out Rigidbody2D rigidbody2d))
-        {
-            rigidbody2d.velocity = Vector2.zero;
-            rigidbody2d.bodyType = RigidbodyType2D.Kinematic;
-        }
-        
+        IsDead = true;
+
+        _animationController.SetAnimationDie();
+
         if (_deathCooldownCoroutine != null)
             StopCoroutine(_deathCooldownCoroutine);
 

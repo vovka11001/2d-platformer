@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class PlayerDetector : Detector<Player>
 {
-    [SerializeField] private LayerMask _playerLayer;
-
     private Player _currentPlayer;
     private Vector2 _direction;
     
@@ -23,8 +21,9 @@ public class PlayerDetector : Detector<Player>
     private void SearchPlayer()
     {
         float distance = 5f;
-        Vector2 raycastPosition = new Vector2(transform.position.x, transform.position.y + 1f);
-        RaycastHit2D hit = Physics2D.Raycast(raycastPosition, _direction, distance, _playerLayer);
+        float offset = 1f;
+        Vector2 raycastPosition = new Vector2(transform.position.x, transform.position.y + offset);
+        RaycastHit2D hit = Physics2D.Raycast(raycastPosition, _direction, distance, _detectableLayer);
         
         if (hit.collider != null)
         {

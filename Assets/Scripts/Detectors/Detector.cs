@@ -1,53 +1,77 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider2D))]
 public class Detector<T> : MonoBehaviour
-{
+{ 
+    [SerializeField] protected LayerMask _detectableLayer;
+
     private readonly float _sizeX = 1f;
     private readonly float _sizeY = 1f;
     private readonly float _offsetY = 0.6f;
-    
-    private BoxCollider2D _collider;
+    private readonly float _overlapAngle = 0f;
+    private readonly float _checkInterval = 0.1f;
+
+    private WaitForSeconds _waitForCheckInterval;
+    private Coroutine _overlapCheckCoroutine;
     private T _detectedComponent;
-    
+
     public event Action<T> TriggerEntered;
-    public event Action<T> TriggerExited; 
-    
+    public event Action<T> TriggerExited;
+
     public bool IsOnTriggerEntered { get; private set; }
 
     private void Awake()
     {
-        _collider = GetComponent<BoxCollider2D>();
+        _waitForCheckInterval = new WaitForSeconds(_checkInterval);
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        _collider.isTrigger = true;
-        _collider.size = new Vector2(_sizeX, _sizeY);
-        _collider.offset = new Vector2(0, _offsetY);
+        if (_overlapCheckCoroutine != null)
+            StopCoroutine(_overlapCheckCoroutine);
+
+        _overlapCheckCoroutine = StartCoroutine(OverlapCheckLoop());
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnDisable()
     {
-        if (other.TryGetComponent(out T component))
+        if (_overlapCheckCoroutine != null)
         {
-            IsOnTriggerEntered = true;
-            _detectedComponent = component;
-            TriggerEntered?.Invoke(component);
+            StopCoroutine(_overlapCheckCoroutine);
+            _overlapCheckCoroutine = null;
         }
     }
-    
-    private void OnTriggerExit2D(Collider2D other)
+
+    private IEnumerator OverlapCheckLoop()
     {
-        if (other.TryGetComponent(out T component))
+        while (true)
         {
-            if (_detectedComponent != null && _detectedComponent.Equals(component))
+            CheckOverlap();
+            yield return _waitForCheckInterval;
+        }
+    }
+
+    private void CheckOverlap()
+    {
+        Vector2 overlapCenter = (Vector2)transform.position + new Vector2(0, _offsetY);
+        Vector2 overlapSize = new Vector2(_sizeX, _sizeY);
+        Collider2D hitCollider = Physics2D.OverlapBox(overlapCenter, overlapSize, _overlapAngle, _detectableLayer);
+
+        if (hitCollider != null && hitCollider.TryGetComponent(out T foundComponent))
+        {
+            if (IsOnTriggerEntered == false)
             {
-                _detectedComponent = default;
+                IsOnTriggerEntered = true;
+                _detectedComponent = foundComponent;
+                TriggerEntered?.Invoke(foundComponent);
             }
+        }
+        else if (IsOnTriggerEntered)
+        {
             IsOnTriggerEntered = false;
-            TriggerExited?.Invoke(component);
+            TriggerExited?.Invoke(_detectedComponent);
+            _detectedComponent = default;
         }
     }
 }
