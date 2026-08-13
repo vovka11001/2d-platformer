@@ -3,32 +3,32 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Slider))]
-public class SmoothHealthBar : MonoBehaviour
+public class SpellChargeBar : MonoBehaviour
 {
-    private float _targetValue;
+    [SerializeField] private PlayerVampirism vampirism;
+
     private float _fillSpeed = 20f;
-    private float _valueThreshold = 0.01f;
+    private float _valueThreshold = 0.001f;
 
     private Slider _slider;
-    private IDamageable _damageable;
+    private float _targetValue;
     private Coroutine _smoothFillCoroutine;
 
     private void Awake()
     {
         _slider = GetComponent<Slider>();
-        _damageable = GetComponentInParent<IDamageable>();
     }
 
     private void OnEnable()
     {
-        if (_damageable != null)
-            _damageable.HealthChanged += SetTarget;
+        vampirism.DurationChanged += OnDurationChanged;
+        vampirism.CooldownChanged += OnCooldownChanged;
     }
 
     private void OnDisable()
     {
-        if (_damageable != null)
-            _damageable.HealthChanged -= SetTarget;
+        vampirism.DurationChanged -= OnDurationChanged;
+        vampirism.CooldownChanged -= OnCooldownChanged;
 
         if (_smoothFillCoroutine != null)
             StopCoroutine(_smoothFillCoroutine);
@@ -36,18 +36,23 @@ public class SmoothHealthBar : MonoBehaviour
 
     private void Start()
     {
-        if (_damageable == null)
-            return;
-
-        _slider.maxValue = _damageable.MaxHealth;
-        _slider.value = _damageable.Health;
-        _targetValue = _damageable.Health;
+        _slider.value = 1f;
+        _targetValue = 1f;
     }
 
-    private void SetTarget(int current, int max)
+    private void OnDurationChanged(float timeRemaining, float totalDuration)
     {
-        _slider.maxValue = max;
-        _targetValue = current;
+        SetTarget(timeRemaining / totalDuration);
+    }
+
+    private void OnCooldownChanged(float elapsedTime, float totalCooldown)
+    {
+        SetTarget(elapsedTime / totalCooldown);
+    }
+
+    private void SetTarget(float targetValue)
+    {
+        _targetValue = targetValue;
 
         if (_smoothFillCoroutine != null)
             StopCoroutine(_smoothFillCoroutine);

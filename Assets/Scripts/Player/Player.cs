@@ -17,6 +17,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private PlayerMover _playerMover;
     [SerializeField] private PlayerJump _playerJump;
     [SerializeField] private GroundDetector _groundDetector;
+    [SerializeField] private PlayerVampirism _vampirism;
     
     private float _speed = 5f;
     private float _jumpForce = 10f;
@@ -43,6 +44,8 @@ public class Player : MonoBehaviour, IDamageable
         _inputReader.Attacked += _playerAttacker.RequestAttack;
         _playerAttacker.AttackRequested += PlayAttackAnimation;
         _animatorEventHandler.Attacked += _playerAttacker.Attack;
+        _inputReader.Spelled += _vampirism.TryActivate;
+        _vampirism.DamageDealt += OnVampirismDamageDealt;
     }
 
     private void OnDisable()
@@ -52,6 +55,8 @@ public class Player : MonoBehaviour, IDamageable
         _inputReader.Attacked -= _playerAttacker.RequestAttack;
         _playerAttacker.AttackRequested -= PlayAttackAnimation;
         _animatorEventHandler.Attacked -= _playerAttacker.Attack;
+        _inputReader.Spelled -= _vampirism.TryActivate;
+        _vampirism.DamageDealt -= OnVampirismDamageDealt;
     }
 
     private void Start()
@@ -97,6 +102,20 @@ public class Player : MonoBehaviour, IDamageable
             Die();
             _animationController.SetAnimationDie();
         }
+    }
+    
+    private void Heal(int amount)
+    {
+        if (IsDead)
+            return;
+
+        Health = Mathf.Min(Health + amount, MaxHealth);
+        HealthChanged?.Invoke(Health, MaxHealth);
+    }
+    
+    private void OnVampirismDamageDealt(int damage)
+    {
+        Heal(damage);
     }
 
     private void PlayAttackAnimation()
