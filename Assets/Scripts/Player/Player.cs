@@ -18,6 +18,8 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private PlayerJump _playerJump;
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private PlayerVampirism _vampirism;
+    [SerializeField] private VampirismRadiusView _vampirismRadiusView;
+    [SerializeField] private SpellChargeBar _spellChargeBar;
     
     private float _speed = 5f;
     private float _jumpForce = 10f;
@@ -46,6 +48,10 @@ public class Player : MonoBehaviour, IDamageable
         _animatorEventHandler.Attacked += _playerAttacker.Attack;
         _inputReader.Spelled += _vampirism.TryActivate;
         _vampirism.DamageDealt += OnVampirismDamageDealt;
+        _vampirism.Activated += _vampirismRadiusView.Show;
+        _vampirism.Deactivated += _vampirismRadiusView.Hide;
+        _vampirism.DurationChanged += _spellChargeBar.SetDurationProgress;
+        _vampirism.CooldownChanged += _spellChargeBar.SetCooldownProgress;
     }
 
     private void OnDisable()
@@ -57,12 +63,17 @@ public class Player : MonoBehaviour, IDamageable
         _animatorEventHandler.Attacked -= _playerAttacker.Attack;
         _inputReader.Spelled -= _vampirism.TryActivate;
         _vampirism.DamageDealt -= OnVampirismDamageDealt;
+        _vampirism.Activated -= _vampirismRadiusView.Show;
+        _vampirism.Deactivated -= _vampirismRadiusView.Hide;
+        _vampirism.DurationChanged -= _spellChargeBar.SetDurationProgress;
+        _vampirism.CooldownChanged -= _spellChargeBar.SetCooldownProgress;
     }
 
     private void Start()
     {
         transform.position = _spawnPoint.transform.position;
         _coinsCollected = new List<Coin>();
+        _spellChargeBar.ResetToFull();
     }
 
     private void Update()

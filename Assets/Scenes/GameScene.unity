@@ -590,6 +590,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7a1c18f7add41f3a6a744a70ab9c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fillSpeed: 20
+  _valueThreshold: 0.01
 --- !u!114 &204718694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1382,6 +1384,8 @@ MonoBehaviour:
   _playerJump: {fileID: 499208622}
   _groundDetector: {fileID: 1291192726}
   _vampirism: {fileID: 499208630}
+  _vampirismRadiusView: {fileID: 525439979}
+  _spellChargeBar: {fileID: 1469699505}
 --- !u!4 &499208617 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4588935210562790, guid: 3248535f6a2562c489a1223a75951ef2, type: 3}
@@ -1474,10 +1478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3f405cbb92314427a0363132a126a9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  _radiusVisual: {fileID: 525439976}
+  _enemyFinder: {fileID: 855025265}
 --- !u!1 &511506964
 GameObject:
   m_ObjectHideFlags: 0
@@ -1655,6 +1656,7 @@ GameObject:
   m_Component:
   - component: {fileID: 525439977}
   - component: {fileID: 525439978}
+  - component: {fileID: 525439979}
   m_Layer: 6
   m_Name: VampirismRadiusVisual
   m_TagString: Untagged
@@ -1729,6 +1731,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &525439979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525439976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8658dd0227a64f10b0ed33c50906b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radiusVisual: {fileID: 525439976}
 --- !u!1 &546059804
 GameObject:
   m_ObjectHideFlags: 0
@@ -2794,6 +2809,7 @@ GameObject:
   m_Component:
   - component: {fileID: 855025263}
   - component: {fileID: 855025264}
+  - component: {fileID: 855025265}
   m_Layer: 0
   m_Name: EnemyDetector
   m_TagString: Untagged
@@ -2831,6 +2847,23 @@ MonoBehaviour:
   _detectableLayer:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &855025265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855025262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a16095f86cb44d44ab3eb27e130bd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  _detectionRadius: 3
+  _maxDetectionCount: 16
 --- !u!1 &887971227
 GameObject:
   m_ObjectHideFlags: 0
@@ -3190,6 +3223,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7a1c18f7add41f3a6a744a70ab9c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fillSpeed: 20
+  _valueThreshold: 0.01
 --- !u!114 &1185754711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4176,7 +4211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20328b67d3dd43a2a37ca3adbe6c491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vampirism: {fileID: 499208630}
+  _fillSpeed: 20
+  _valueThreshold: 0.001
 --- !u!1 &1486994180
 GameObject:
   m_ObjectHideFlags: 0
@@ -4374,6 +4410,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7a1c18f7add41f3a6a744a70ab9c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fillSpeed: 20
+  _valueThreshold: 0.01
 --- !u!114 &1584917345
 MonoBehaviour:
   m_ObjectHideFlags: 0
